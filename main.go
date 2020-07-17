@@ -50,6 +50,11 @@ func main() {
   if err != nil {
     panic(err)
   }
+
+  err = connection.PingContext(ctx)
+  if err != nil {
+    panic("Impossible to ping the db")
+  }
   defer stmt.Close()
 
   if _, err := stmt.ExecContext(ctx); err != nil {
