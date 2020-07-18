@@ -20,7 +20,7 @@ type Config struct {
   Password string
 }
 
-func main() {
+func SimpleQuery() error {
   cfg := Config{
     OracleClientPath: os.Getenv("ORACLE_CLIENT_PATH"),
 
@@ -41,23 +41,32 @@ func main() {
     c,
   )
   if err != nil {
-    panic(err)
+    return err
   }
 
   ctx := context.Background()
 
   stmt, err := connection.PrepareContext(ctx, "SELECT 1 FROM DUAL")
   if err != nil {
-    panic(err)
+    return err
   }
 
   err = connection.PingContext(ctx)
   if err != nil {
-    panic("Impossible to ping the db")
+    return err
   }
   defer stmt.Close()
 
   if _, err := stmt.ExecContext(ctx); err != nil {
+    return err
+  }
+
+  return nil
+}
+
+func main() {
+  err := SimpleQuery()
+  if err != nil {
     panic(err)
   }
 }
