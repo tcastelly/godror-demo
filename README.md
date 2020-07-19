@@ -1,11 +1,5 @@
-# Build the application
-
-## Go
-> go build
-
-## Docker
-> docker build -t godror-demo
-
+# Releases available
+https://github.com/tcastelly/godror-demo/releases/tag/v1.0.0
 
 # Launch the application
 ## Native
@@ -28,3 +22,11 @@ docker run --env DPI_DEBUG_LEVEL=92 \
     --env DB_CONNECT_SID=dev \
     godror-demo
 ```
+
+# Build the application
+
+## Go
+> go build
+
+## Docker
+> docker build -t godror-demo
