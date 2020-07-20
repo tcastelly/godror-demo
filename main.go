@@ -46,6 +46,10 @@ func SimpleQuery() error {
 
   ctx := context.Background()
 
+  connection.SetMaxIdleConns(0)
+  connection.SetMaxOpenConns(0)
+  connection.SetConnMaxLifetime(0)
+
   stmt, err := connection.PrepareContext(ctx, "SELECT 1 FROM DUAL")
   if err != nil {
     return err
