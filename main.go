@@ -4,6 +4,7 @@ import (
   "context"
   "database/sql"
   "fmt"
+  "github.com/godror/godror"
   _ "github.com/godror/godror"
   "os"
 )
@@ -33,8 +34,9 @@ func SimpleQuery() error {
     Password: os.Getenv("DB_CONNECT_PWD"),
   }
 
-
   c := fmt.Sprintf("%s/%s@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=1521)))(CONNECT_DATA=(SID=%s)))", cfg.User, cfg.Password, cfg.Domain, cfg.SID)
+
+  godror.Log = func(keyvals ...interface{}) error { fmt.Println(keyvals); return nil }
 
   connection, err := sql.Open(
     "godror",
