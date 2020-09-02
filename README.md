@@ -30,3 +30,7 @@ docker run --env DPI_DEBUG_LEVEL=92 \
 
 ## Docker
 > docker build -t godror-demo
+
+
+# Github Actions
+Look throw `./.github/workflows/build.yaml` to see how build the application
