@@ -1,6 +1,3 @@
-# Releases available
-https://github.com/tcastelly/godror-demo/releases/tag/v1.0.0
-
 # Launch the application
 ## Native
 ```bash
