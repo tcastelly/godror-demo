@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# script to install oracle client driver in local environment
+
+if [ "$(uname)" == "Darwin" ]; then
+  instantclient_basic=instantclient-basiclite-macos.x64-18.1.0.0.0.zip
+  instantclient_sdk=instantclient-sdk-macos.x64-18.1.0.0.0-2.zip
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+  instantclient_basic=instantclient-basiclite-linux.x64-19.3.0.0.0dbru.zip
+  instantclient_sdk=instantclient-sdk-linux.x64-19.3.0.0.0dbru.zip
+else
+  echo "Unsuported OS"
+  exit 1
+fi
+
+# fix env
+rootPath=$(pwd)
+export OCI_LIB_DIR="$(pwd)/.oracle/instantclient"
+if [ ! -d ".oracle" ]; then
+    echo "Install driver ..."
+    mkdir -p .oracle
+    cd .oracle
+
+    # download driver
+    wget https://github.com/shenron/docker-node/raw/master/oracle_client/conf/oracle/$instantclient_basic &&\
+        wget https://github.com/shenron/docker-node/raw/master/oracle_client/conf/oracle/$instantclient_sdk
+
+    # install
+    unzip ./$instantclient_basic -d ./ && \
+        unzip ./$instantclient_sdk -d ./ && \
+        rm ./$instantclient_basic ./$instantclient_sdk &&\
+        mv ./$(ls . | sort -n | head -1 ) ./instantclient
+
+    cd $rootPath
+fi
+
+# fix env
+export LD_LIBRARY_PATH="$(pwd)/.oracle/instantclient"
+export OCI_INC_DIR="$OCI_LIB_DIR/sdk/include"
+
+echo "Launch application ..."
+
