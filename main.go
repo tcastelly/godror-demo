@@ -1,74 +1,71 @@
 package main
 
 import (
-  "context"
-  "database/sql"
-  "fmt"
-  "github.com/godror/godror"
-  _ "github.com/godror/godror"
-  "os"
+	"context"
+	"database/sql"
+	"fmt"
+	_ "github.com/godror/godror"
+	"os"
 )
 
 type Config struct {
-  OracleClientPath string
+	OracleClientPath string
 
-  Domain string
+	Domain string
 
-  SID string
+	SID string
 
-  User string
+	User string
 
-  Password string
+	Password string
 }
 
 func SimpleQuery() error {
-  cfg := Config{
-    OracleClientPath: os.Getenv("ORACLE_CLIENT_PATH"),
+	cfg := Config{
+		OracleClientPath: os.Getenv("ORACLE_CLIENT_PATH"),
 
-    Domain: os.Getenv("DB_CONNECT_HOST"),
+		Domain: os.Getenv("DB_CONNECT_HOST"),
 
-    SID: os.Getenv("DB_CONNECT_SID"),
+		SID: os.Getenv("DB_CONNECT_SID"),
 
-    User: os.Getenv("DB_CONNECT_USR"),
+		User: os.Getenv("DB_CONNECT_USR"),
 
-    Password: os.Getenv("DB_CONNECT_PWD"),
-  }
+		Password: os.Getenv("DB_CONNECT_PWD"),
+	}
 
-  c := fmt.Sprintf("%s/%s@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=1521)))(CONNECT_DATA=(SID=%s)))", cfg.User, cfg.Password, cfg.Domain, cfg.SID)
+	c := fmt.Sprintf("%s/%s@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=1521)))(CONNECT_DATA=(SID=%s)))", cfg.User, cfg.Password, cfg.Domain, cfg.SID)
 
-  godror.Log = func(keyvals ...interface{}) error { fmt.Println(keyvals); return nil }
+	connection, err := sql.Open(
+		"godror",
+		c,
+	)
+	if err != nil {
+		return err
+	}
 
-  connection, err := sql.Open(
-    "godror",
-    c,
-  )
-  if err != nil {
-    return err
-  }
+	ctx := context.Background()
 
-  ctx := context.Background()
+	stmt, err := connection.PrepareContext(ctx, "SELECT 1 FROM DUAL")
+	if err != nil {
+		return err
+	}
 
-  stmt, err := connection.PrepareContext(ctx, "SELECT 1 FROM DUAL")
-  if err != nil {
-    return err
-  }
+	err = connection.PingContext(ctx)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
 
-  err = connection.PingContext(ctx)
-  if err != nil {
-    return err
-  }
-  defer stmt.Close()
+	if _, err := stmt.ExecContext(ctx); err != nil {
+		return err
+	}
 
-  if _, err := stmt.ExecContext(ctx); err != nil {
-    return err
-  }
-
-  return nil
+	return nil
 }
 
 func main() {
-  err := SimpleQuery()
-  if err != nil {
-    panic(err)
-  }
+	err := SimpleQuery()
+	if err != nil {
+		panic(err)
+	}
 }
